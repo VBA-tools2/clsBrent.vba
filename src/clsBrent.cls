@@ -2,7 +2,7 @@ VERSION 1.0 CLASS
 BEGIN
   MultiUse = -1  'True
 END
-Attribute VB_Name = "Brent"
+Attribute VB_Name = "clsBrent"
 Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
@@ -11,6 +11,11 @@ Attribute VB_Exposed = False
 '==============================================================================
 'downloaded from
 '<http://www.quantcode.com/modules/mydownloads/singlefile.php?cid=9&lid=232>
+'    modified functions to be able to state more parameters to the
+'    functions which are then called. Added an "X" to the function names
+'    which are now named
+'    - RunFunctionX
+'    - SolveX
 '==============================================================================
 
 Option Explicit
@@ -25,15 +30,66 @@ Public Sub AssignObject(callbackObject As Object)
   Set callbackObject_ = callbackObject
 End Sub
 
-Private Function RunFunction(FunctionName As String, x As Double) As Double
-  If objectMode_ = False Then
-    RunFunction = Application.Run(FunctionName, x)
-  Else
-    RunFunction = CallByName(callbackObject_, FunctionName, VbMethod, x)
-  End If
+'==============================================================================
+
+'modified function (originally 'RunFunction') which can handle an optional
+'number of additional arguments, which can be stored in 'arr'
+Private Function RunFunctionX( _
+    FunctionName As String, _
+    x As Double, _
+    Optional arr As Variant _
+        ) As Double
+    
+    If IsMissing(arr) Then
+        If objectMode_ = False Then
+            RunFunctionX = Application.Run(FunctionName, x)
+        Else
+            RunFunctionX = CallByName(callbackObject_, FunctionName, VbMethod, x)
+        End If
+    Else
+        Select Case UBound(arr)
+            Case 2
+                If objectMode_ = False Then
+                    RunFunctionX = Application.Run(FunctionName, _
+                            x, arr(0), arr(1), arr(2))
+                Else
+                    RunFunctionX = CallByName(callbackObject_, FunctionName, _
+                        VbMethod, x, arr(0), arr(1), arr(2))
+                End If
+            Case 5
+                If objectMode_ = False Then
+                    RunFunctionX = Application.Run(FunctionName, _
+                            x, arr(0), arr(1), arr(2), arr(3), arr(4), arr(5))
+                Else
+                    RunFunctionX = CallByName(callbackObject_, FunctionName, _
+                        VbMethod, x, arr(0), arr(1), arr(2), arr(3), arr(4), arr(5))
+                End If
+            Case 7
+                If objectMode_ = False Then
+                    RunFunctionX = Application.Run(FunctionName, _
+                            x, arr(0), arr(1), arr(2), arr(3), arr(4), arr(5), _
+                            arr(6), arr(7))
+                Else
+                    RunFunctionX = CallByName(callbackObject_, FunctionName, _
+                        VbMethod, x, arr(0), arr(1), arr(2), arr(3), arr(4), arr(5), _
+                        arr(6), arr(7))
+                End If
+        End Select
+    End If
+    
 End Function
 
-Public Function Solve(FunctionName As String, Accuracy As Double, Guess As Double, xa As Double, xb As Double) As Double
+'modified function (originally 'Solve') which can handle an optional
+'number of arbitrary arguments, which can be stored in 'arr'
+Public Function SolveX( _
+    FunctionName As String, _
+    Accuracy As Double, _
+    Guess As Double, _
+    xa As Double, _
+    xb As Double, _
+    Optional arr As Variant _
+        ) As Double
+    
   Dim Iter As Single
   Dim e, TempDbl, fxa, fxb, soln As Double
 
@@ -45,15 +101,15 @@ Public Function Solve(FunctionName As String, Accuracy As Double, Guess As Doubl
   End If
 
   
-  fxa = RunFunction(FunctionName, xa)
+  fxa = RunFunctionX(FunctionName, xa, arr)
   If (Abs(fxa) < Accuracy) Then
-    Solve = xa
+    SolveX = xa
     Exit Function
   End If
   
-  fxb = RunFunction(FunctionName, xb)
+  fxb = RunFunctionX(FunctionName, xb, arr)
   If (Abs(fxb) < Accuracy) Then
-    Solve = xb
+    SolveX = xb
     Exit Function
   End If
   
@@ -115,7 +171,7 @@ Public Function Solve(FunctionName As String, Accuracy As Double, Guess As Doubl
     xMid = 0.5 * (xb - soln)
     'exit if function has converged
     If (Abs(xMid) <= xTol1 Or fsoln = 0) Then
-      Solve = soln
+      SolveX = soln
       Exit Function
     End If
     If (Abs(e) >= xTol1 And Abs(fxa) > Abs(fsoln)) Then
@@ -158,11 +214,13 @@ Public Function Solve(FunctionName As String, Accuracy As Double, Guess As Doubl
     Else
       soln = soln + sign(xTol1, xMid)
     End If
-    fsoln = RunFunction(FunctionName, soln)
+    fsoln = RunFunctionX(FunctionName, soln, arr)
     Iter = Iter + 1
   Loop
   
 End Function
+
+'==============================================================================
 
 Public Sub ShowMessageBox(Msg As String)
   If Silent_ = False Then

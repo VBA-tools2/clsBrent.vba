@@ -91,12 +91,15 @@ Public Function SolveX( _
         ) As Double
     
   Dim Iter As Single
-  Dim e, TempDbl, fxa, fxb, soln As Double
-
-  Dim tempstr As String
+  Dim e As Double
+  Dim fxa As Double
+  Dim fxb As Double
+  Dim soln As Double
+  
+  Dim TempStr As String
   If Not xa < xb Then
-    tempstr = "invalid range: xa (" & xa & ") >= xb (" & xb
-    ShowMessageBox tempstr
+    TempStr = "invalid range: xa (" & xa & ") >= xb (" & xb & ")"
+    ShowMessageBox TempStr
     Exit Function
   End If
 
@@ -116,18 +119,18 @@ Public Function SolveX( _
   Iter = 2
   
   If Not fxa * fxb < 0 Then
-    tempstr = "root not bracketed: f[" & xa & "," & (xb) & "] -> [" & (fxa) & "," & (fxb) & "]"
-    ShowMessageBox tempstr
+    TempStr = "root not bracketed: f[" & xa & "," & (xb) & "] -> [" & (fxa) & "," & (fxb) & "]"
+    ShowMessageBox TempStr
     Exit Function
   End If
   If Not Guess > xa Then
-    tempstr = " guess (" & Guess & ") < xa (" & xa & ")"
-    ShowMessageBox tempstr
+    TempStr = " guess (" & Guess & ") < xa (" & xa & ")"
+    ShowMessageBox TempStr
     Exit Function
   End If
   If Not Guess < xb Then
-    tempstr = " guess (" & Guess & ") > xb (" & xb & ")"
-    ShowMessageBox tempstr
+    TempStr = " guess (" & Guess & ") > xb (" & xb & ")"
+    ShowMessageBox TempStr
     Exit Function
   End If
   

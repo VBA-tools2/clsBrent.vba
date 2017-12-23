@@ -102,7 +102,7 @@ Public Function SolveX( _
     ShowMessageBox TempStr
     Exit Function
   End If
-
+  
   
   fxa = RunFunctionX(FunctionName, xa, Arr)
   If (Abs(fxa) < Accuracy) Then
@@ -140,7 +140,7 @@ Public Function SolveX( _
   Dim fsoln As Double
   Dim p As Double
   Dim q As Double
-  Dim R As Double
+  Dim r As Double
   Dim s As Double
   Dim xTol1 As Double
   Dim xMid As Double
@@ -186,9 +186,9 @@ Public Function SolveX( _
         q = 1 - s
       Else
         q = fxa / fxb
-        R = fsoln / fxb
-        p = s * (2 * xMid * q * (q - R) - (soln - xa) * (R - 1))
-        q = (q - 1) * (R - 1) * (s - 1)
+        r = fsoln / fxb
+        p = s * (2 * xMid * q * (q - r) - (soln - xa) * (r - 1))
+        q = (q - 1) * (r - 1) * (s - 1)
       End If
       If (p > 0) Then
         q = -q

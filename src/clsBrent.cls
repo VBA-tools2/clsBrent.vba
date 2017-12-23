@@ -196,7 +196,10 @@ Public Function SolveX( _
       p = Abs(p)
       
      
-      If (p < 0.5 * Application.min(3 * xMid * q - Abs(xTol1 * q), Abs(e * q))) Then
+      If (p < 0.5 * Application.WorksheetFunction.Min( _
+            3 * xMid * q - Abs(xTol1 * q), _
+            Abs(e * q)) _
+      ) Then
         'secant mathod is fast so consider interpolation
         e = d
         d = p / q

@@ -33,46 +33,46 @@ End Sub
 '==============================================================================
 
 'modified function (originally 'RunFunction') which can handle an optional
-'number of additional arguments, which can be stored in 'arr'
+'number of additional arguments, which can be stored in 'Arr'
 Private Function RunFunctionX( _
     FunctionName As String, _
     x As Double, _
-    Optional arr As Variant _
+    Optional Arr As Variant _
         ) As Double
     
-    If IsMissing(arr) Then
+    If IsMissing(Arr) Then
         If objectMode_ = False Then
             RunFunctionX = Application.Run(FunctionName, x)
         Else
             RunFunctionX = CallByName(callbackObject_, FunctionName, VbMethod, x)
         End If
     Else
-        Select Case UBound(arr)
+        Select Case UBound(Arr)
             Case 2
                 If objectMode_ = False Then
                     RunFunctionX = Application.Run(FunctionName, _
-                            x, arr(0), arr(1), arr(2))
+                            x, Arr(0), Arr(1), Arr(2))
                 Else
                     RunFunctionX = CallByName(callbackObject_, FunctionName, _
-                        VbMethod, x, arr(0), arr(1), arr(2))
+                        VbMethod, x, Arr(0), Arr(1), Arr(2))
                 End If
             Case 5
                 If objectMode_ = False Then
                     RunFunctionX = Application.Run(FunctionName, _
-                            x, arr(0), arr(1), arr(2), arr(3), arr(4), arr(5))
+                            x, Arr(0), Arr(1), Arr(2), Arr(3), Arr(4), Arr(5))
                 Else
                     RunFunctionX = CallByName(callbackObject_, FunctionName, _
-                        VbMethod, x, arr(0), arr(1), arr(2), arr(3), arr(4), arr(5))
+                        VbMethod, x, Arr(0), Arr(1), Arr(2), Arr(3), Arr(4), Arr(5))
                 End If
             Case 7
                 If objectMode_ = False Then
                     RunFunctionX = Application.Run(FunctionName, _
-                            x, arr(0), arr(1), arr(2), arr(3), arr(4), arr(5), _
-                            arr(6), arr(7))
+                            x, Arr(0), Arr(1), Arr(2), Arr(3), Arr(4), Arr(5), _
+                            Arr(6), Arr(7))
                 Else
                     RunFunctionX = CallByName(callbackObject_, FunctionName, _
-                        VbMethod, x, arr(0), arr(1), arr(2), arr(3), arr(4), arr(5), _
-                        arr(6), arr(7))
+                        VbMethod, x, Arr(0), Arr(1), Arr(2), Arr(3), Arr(4), Arr(5), _
+                        Arr(6), Arr(7))
                 End If
         End Select
     End If
@@ -80,14 +80,14 @@ Private Function RunFunctionX( _
 End Function
 
 'modified function (originally 'Solve') which can handle an optional
-'number of arbitrary arguments, which can be stored in 'arr'
+'number of arbitrary arguments, which can be stored in 'Arr'
 Public Function SolveX( _
     FunctionName As String, _
     Accuracy As Double, _
     Guess As Double, _
     xa As Double, _
     xb As Double, _
-    Optional arr As Variant _
+    Optional Arr As Variant _
         ) As Double
     
   Dim Iter As Single
@@ -104,13 +104,13 @@ Public Function SolveX( _
   End If
 
   
-  fxa = RunFunctionX(FunctionName, xa, arr)
+  fxa = RunFunctionX(FunctionName, xa, Arr)
   If (Abs(fxa) < Accuracy) Then
     SolveX = xa
     Exit Function
   End If
   
-  fxb = RunFunctionX(FunctionName, xb, arr)
+  fxb = RunFunctionX(FunctionName, xb, Arr)
   If (Abs(fxb) < Accuracy) Then
     SolveX = xb
     Exit Function
@@ -217,7 +217,7 @@ Public Function SolveX( _
     Else
       soln = soln + sign(xTol1, xMid)
     End If
-    fsoln = RunFunctionX(FunctionName, soln, arr)
+    fsoln = RunFunctionX(FunctionName, soln, Arr)
     Iter = Iter + 1
   Loop
   

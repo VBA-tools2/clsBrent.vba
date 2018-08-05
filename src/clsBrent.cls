@@ -33,7 +33,7 @@ End Sub
 '==============================================================================
 
 'modified function (originally 'RunFunction') which can handle an optional
-'number of additional arguments, which can be stored in 'Arr'
+'number of additional arguments that can be stored in 'Arr'
 Private Function RunFunctionX( _
     FunctionName As String, _
     x As Double, _
@@ -80,7 +80,9 @@ Private Function RunFunctionX( _
 End Function
 
 'modified function (originally 'Solve') which can handle an optional
-'number of arbitrary arguments, which can be stored in 'Arr'
+'number of arbitrary arguments that can be stored in 'Arr'
+'- xa = x_min
+'- xb = x_max
 Public Function SolveX( _
     FunctionName As String, _
     Accuracy As Double, _
@@ -179,7 +181,7 @@ Public Function SolveX( _
     End If
     If (Abs(e) >= xTol1 And Abs(fxa) > Abs(fsoln)) Then
     
-      ' inverse quadratic interpolation
+      'inverse quadratic interpolation
       s = fsoln / fxa
       If (xa = xb) Then
         p = 2 * xMid * s
@@ -200,7 +202,7 @@ Public Function SolveX( _
             3 * xMid * q - Abs(xTol1 * q), _
             Abs(e * q)) _
       ) Then
-        'secant mathod is fast so consider interpolation
+        'secant method is fast so consider interpolation
         e = d
         d = p / q
       Else
@@ -209,7 +211,7 @@ Public Function SolveX( _
         e = d
       End If
     Else
-      ' Bounds decreasing too slowly, use bisection
+      'bounds decreasing too slowly, use bisection
       d = xMid
       e = d
     End If

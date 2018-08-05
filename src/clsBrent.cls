@@ -107,36 +107,38 @@ Public Function SolveX( _
   SolveX = CVErr(xlErrValue)
   
   If xa >= xb Then
-    TempStr = "invalid range: xa (" & xa & ") >= xb (" & xb & ")"
-    ShowMessageBox TempStr
+    TempStr = "  error: invalid range: xa (" & xa & ") >= xb (" & xb & ")"
+    ShowMessage TempStr
     Exit Function
   End If
   
   fxa = RunFunctionX(FunctionName, xa, Arr)
   If Abs(fxa) < Accuracy Then
     SolveX = xa
+    ShowMessage "  SolveX = xa = " & xa
     Exit Function
   End If
   
   fxb = RunFunctionX(FunctionName, xb, Arr)
   If Abs(fxb) < Accuracy Then
     SolveX = xb
+    ShowMessage "  SolveX = xb = " & xb
     Exit Function
   End If
   
   If fxa * fxb >= 0 Then
-    TempStr = "root not bracketed: f[" & xa & "," & (xb) & "] -> [" & (fxa) & "," & (fxb) & "]"
-    ShowMessageBox TempStr
+    TempStr = "  error: root not bracketed: f[" & xa & ";" & xb & "] -> [" & fxa & ";" & fxb & "]"
+    ShowMessage TempStr
     Exit Function
   End If
   If Guess <= xa Then
-    TempStr = " guess (" & Guess & ") < xa (" & xa & ")"
-    ShowMessageBox TempStr
+    TempStr = "  error: guess (" & Guess & ") < xa (" & xa & ")"
+    ShowMessage TempStr
     Exit Function
   End If
   If Guess >= xb Then
-    TempStr = " guess (" & Guess & ") > xb (" & xb & ")"
-    ShowMessageBox TempStr
+    TempStr = "  error: guess (" & Guess & ") > xb (" & xb & ")"
+    ShowMessage TempStr
     Exit Function
   End If
   
@@ -185,6 +187,8 @@ Public Function SolveX( _
     'exit if function has converged
     If Abs(xMid) <= xTol1 Or fsoln = 0 Then
       SolveX = soln
+      ShowMessage "  SolveX(" & Iter & ") = " & soln _
+            & vbTab & "(" & fsoln & ")"
       Exit Function
     End If
     
@@ -241,9 +245,9 @@ End Function
 
 '==============================================================================
 
-Public Sub ShowMessageBox(Msg As String)
+Public Sub ShowMessage(Msg As String)
   If Silent_ = False Then
-    MsgBox Msg
+    Debug.Print Msg
   End If
 End Sub
 

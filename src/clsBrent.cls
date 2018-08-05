@@ -99,7 +99,7 @@ Public Function SolveX( _
   Dim soln As Double
   
   Dim TempStr As String
-  If Not xa < xb Then
+  If xa >= xb Then
     TempStr = "invalid range: xa (" & xa & ") >= xb (" & xb & ")"
     ShowMessageBox TempStr
     Exit Function
@@ -120,17 +120,17 @@ Public Function SolveX( _
   
   Iter = 2
   
-  If Not fxa * fxb < 0 Then
+  If fxa * fxb >= 0 Then
     TempStr = "root not bracketed: f[" & xa & "," & (xb) & "] -> [" & (fxa) & "," & (fxb) & "]"
     ShowMessageBox TempStr
     Exit Function
   End If
-  If Not Guess > xa Then
+  If Guess <= xa Then
     TempStr = " guess (" & Guess & ") < xa (" & xa & ")"
     ShowMessageBox TempStr
     Exit Function
   End If
-  If Not Guess < xb Then
+  If Guess >= xb Then
     TempStr = " guess (" & Guess & ") > xb (" & xb & ")"
     ShowMessageBox TempStr
     Exit Function

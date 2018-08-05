@@ -90,7 +90,7 @@ Public Function SolveX( _
     xa As Double, _
     xb As Double, _
     Optional Arr As Variant _
-        ) As Double
+        ) As Variant
     
   Dim Iter As Long
   Dim e As Double
@@ -100,6 +100,11 @@ Public Function SolveX( _
   
   Dim TempStr As String
   
+  
+  ShowMessage FunctionName & vbTab & xa & vbTab & xb
+  
+  'initialize with an error value
+  SolveX = CVErr(xlErrValue)
   
   If xa >= xb Then
     TempStr = "invalid range: xa (" & xa & ") >= xb (" & xb & ")"

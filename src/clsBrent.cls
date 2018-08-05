@@ -147,8 +147,10 @@ Public Function SolveX( _
   Dim xTol1 As Double
   Dim xMid As Double
   Dim d As Double
-  Dim Eps As Double
-  Eps = 2 ^ -52
+  
+  '============================================================================
+  Const Eps As Double = 2 ^ -52
+  '============================================================================
   
   d = 0
   e = 0

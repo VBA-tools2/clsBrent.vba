@@ -25,59 +25,16 @@ Private objectMode_ As Boolean
 Private callbackObject_ As Object
 Public Silent_ As Boolean
 
-Public Sub AssignObject(callbackObject As Object)
-  objectMode_ = True
-  Set callbackObject_ = callbackObject
+
+Private Sub Class_Initialize()
+  maxIterations_ = 100
+  objectMode_ = False
+'  Silent_ = False
+  Silent_ = True
 End Sub
 
-'==============================================================================
 
-'modified function (originally 'RunFunction') which can handle an optional
-'number of additional arguments that can be stored in 'Arr'
-Private Function RunFunctionX( _
-    FunctionName As String, _
-    x As Double, _
-    Optional Arr As Variant _
-        ) As Double
-    
-    If IsMissing(Arr) Then
-        If objectMode_ = False Then
-            RunFunctionX = Application.Run(FunctionName, x)
-        Else
-            RunFunctionX = CallByName(callbackObject_, FunctionName, VbMethod, x)
-        End If
-    Else
-        Select Case UBound(Arr)
-            Case 2
-                If objectMode_ = False Then
-                    RunFunctionX = Application.Run(FunctionName, _
-                            x, Arr(0), Arr(1), Arr(2))
-                Else
-                    RunFunctionX = CallByName(callbackObject_, FunctionName, _
-                        VbMethod, x, Arr(0), Arr(1), Arr(2))
-                End If
-            Case 5
-                If objectMode_ = False Then
-                    RunFunctionX = Application.Run(FunctionName, _
-                            x, Arr(0), Arr(1), Arr(2), Arr(3), Arr(4), Arr(5))
-                Else
-                    RunFunctionX = CallByName(callbackObject_, FunctionName, _
-                        VbMethod, x, Arr(0), Arr(1), Arr(2), Arr(3), Arr(4), Arr(5))
-                End If
-            Case 7
-                If objectMode_ = False Then
-                    RunFunctionX = Application.Run(FunctionName, _
-                            x, Arr(0), Arr(1), Arr(2), Arr(3), Arr(4), Arr(5), _
-                            Arr(6), Arr(7))
-                Else
-                    RunFunctionX = CallByName(callbackObject_, FunctionName, _
-                        VbMethod, x, Arr(0), Arr(1), Arr(2), Arr(3), Arr(4), Arr(5), _
-                        Arr(6), Arr(7))
-                End If
-        End Select
-    End If
-    
-End Function
+'==============================================================================
 
 'modified function (originally 'Solve') which can handle an optional
 'number of arbitrary arguments that can be stored in 'Arr'
@@ -243,6 +200,54 @@ Public Function SolveX( _
   
 End Function
 
+
+'modified function (originally 'RunFunction') which can handle an optional
+'number of additional arguments that can be stored in 'Arr'
+Private Function RunFunctionX( _
+    FunctionName As String, _
+    x As Double, _
+    Optional Arr As Variant _
+        ) As Double
+    
+    If IsMissing(Arr) Then
+        If objectMode_ = False Then
+            RunFunctionX = Application.Run(FunctionName, x)
+        Else
+            RunFunctionX = CallByName(callbackObject_, FunctionName, VbMethod, x)
+        End If
+    Else
+        Select Case UBound(Arr)
+            Case 2
+                If objectMode_ = False Then
+                    RunFunctionX = Application.Run(FunctionName, _
+                            x, Arr(0), Arr(1), Arr(2))
+                Else
+                    RunFunctionX = CallByName(callbackObject_, FunctionName, _
+                        VbMethod, x, Arr(0), Arr(1), Arr(2))
+                End If
+            Case 5
+                If objectMode_ = False Then
+                    RunFunctionX = Application.Run(FunctionName, _
+                            x, Arr(0), Arr(1), Arr(2), Arr(3), Arr(4), Arr(5))
+                Else
+                    RunFunctionX = CallByName(callbackObject_, FunctionName, _
+                        VbMethod, x, Arr(0), Arr(1), Arr(2), Arr(3), Arr(4), Arr(5))
+                End If
+            Case 7
+                If objectMode_ = False Then
+                    RunFunctionX = Application.Run(FunctionName, _
+                            x, Arr(0), Arr(1), Arr(2), Arr(3), Arr(4), Arr(5), _
+                            Arr(6), Arr(7))
+                Else
+                    RunFunctionX = CallByName(callbackObject_, FunctionName, _
+                        VbMethod, x, Arr(0), Arr(1), Arr(2), Arr(3), Arr(4), Arr(5), _
+                        Arr(6), Arr(7))
+                End If
+        End Select
+    End If
+    
+End Function
+
 '==============================================================================
 
 Public Sub ShowMessage(Msg As String)
@@ -251,6 +256,12 @@ Public Sub ShowMessage(Msg As String)
   End If
 End Sub
 
+Public Sub AssignObject(callbackObject As Object)
+  objectMode_ = True
+  Set callbackObject_ = callbackObject
+End Sub
+
+
 Public Function sign(a As Double, b As Double) As Double
   If b >= 0 Then
     sign = Abs(a)
@@ -258,10 +269,3 @@ Public Function sign(a As Double, b As Double) As Double
     sign = -Abs(a)
   End If
 End Function
-
-Private Sub Class_Initialize()
-  maxIterations_ = 100
-  objectMode_ = False
-'  Silent_ = False
-  Silent_ = True
-End Sub

@@ -137,8 +137,8 @@ Public Function SolveX( _
   End If
   
   soln = Guess
-  Dim xAccuracy As Double
-  xAccuracy = Accuracy
+  
+  
   Dim fsoln As Double
   Dim p As Double
   Dim q As Double
@@ -174,7 +174,7 @@ Public Function SolveX( _
       fxb = fxa
     End If
 
-    xTol1 = 2 * Eps * Abs(soln) + 0.5 * xAccuracy
+    xTol1 = 2 * Eps * Abs(soln) + 0.5 * Accuracy
     xMid = 0.5 * (xb - soln)
     'exit if function has converged
     If Abs(xMid) <= xTol1 Or fsoln = 0 Then

@@ -107,13 +107,13 @@ Public Function SolveX( _
   
   
   fxa = RunFunctionX(FunctionName, xa, Arr)
-  If (Abs(fxa) < Accuracy) Then
+  If Abs(fxa) < Accuracy Then
     SolveX = xa
     Exit Function
   End If
   
   fxb = RunFunctionX(FunctionName, xb, Arr)
-  If (Abs(fxb) < Accuracy) Then
+  If Abs(fxb) < Accuracy Then
     SolveX = xb
     Exit Function
   End If
@@ -158,14 +158,14 @@ Public Function SolveX( _
   
   soln = xb
   fsoln = fxb
-  Do While (Iter <= maxIterations_)
-    If ((fsoln > 0 And fxb > 0) Or (fsoln < 0 And fxb < 0)) Then
+  Do While Iter <= maxIterations_
+    If (fsoln > 0 And fxb > 0) Or (fsoln < 0 And fxb < 0) Then
       xb = xa
       fxb = fxa
       d = soln - xa
       e = d
     End If
-    If (Abs(fxb) < Abs(fsoln)) Then
+    If Abs(fxb) < Abs(fsoln) Then
       xa = soln
       soln = xb
       xb = xa
@@ -177,15 +177,15 @@ Public Function SolveX( _
     xTol1 = 2 * Eps * Abs(soln) + 0.5 * xAccuracy
     xMid = 0.5 * (xb - soln)
     'exit if function has converged
-    If (Abs(xMid) <= xTol1 Or fsoln = 0) Then
+    If Abs(xMid) <= xTol1 Or fsoln = 0 Then
       SolveX = soln
       Exit Function
     End If
-    If (Abs(e) >= xTol1 And Abs(fxa) > Abs(fsoln)) Then
+    If Abs(e) >= xTol1 And Abs(fxa) > Abs(fsoln) Then
     
       'inverse quadratic interpolation
       s = fsoln / fxa
-      If (xa = xb) Then
+      If xa = xb Then
         p = 2 * xMid * s
         q = 1 - s
       Else
@@ -194,15 +194,15 @@ Public Function SolveX( _
         p = s * (2 * xMid * q * (q - r) - (soln - xa) * (r - 1))
         q = (q - 1) * (r - 1) * (s - 1)
       End If
-      If (p > 0) Then
+      If p > 0 Then
         q = -q
       End If
       p = Abs(p)
       
      
-      If (p < 0.5 * Application.WorksheetFunction.Min( _
+      If p < 0.5 * Application.WorksheetFunction.Min( _
             3 * xMid * q - Abs(xTol1 * q), _
-            Abs(e * q)) _
+            Abs(e * q) _
       ) Then
         'secant method is fast so consider interpolation
         e = d
@@ -219,7 +219,7 @@ Public Function SolveX( _
     End If
     xa = soln
     fxa = fsoln
-    If (Abs(d) > xTol1) Then
+    If Abs(d) > xTol1 Then
       soln = soln + d
     Else
       soln = soln + sign(xTol1, xMid)

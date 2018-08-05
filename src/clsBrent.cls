@@ -99,12 +99,13 @@ Public Function SolveX( _
   Dim soln As Double
   
   Dim TempStr As String
+  
+  
   If xa >= xb Then
     TempStr = "invalid range: xa (" & xa & ") >= xb (" & xb & ")"
     ShowMessageBox TempStr
     Exit Function
   End If
-  
   
   fxa = RunFunctionX(FunctionName, xa, Arr)
   If Abs(fxa) < Accuracy Then
@@ -158,6 +159,8 @@ Public Function SolveX( _
   
   soln = xb
   fsoln = fxb
+  
+
   Do While Iter <= maxIterations_
     If (fsoln > 0 And fxb > 0) Or (fsoln < 0 And fxb < 0) Then
       xb = xa
@@ -173,16 +176,17 @@ Public Function SolveX( _
       fsoln = fxb
       fxb = fxa
     End If
-
+    
     xTol1 = 2 * Eps * Abs(soln) + 0.5 * Accuracy
     xMid = 0.5 * (xb - soln)
+    
     'exit if function has converged
     If Abs(xMid) <= xTol1 Or fsoln = 0 Then
       SolveX = soln
       Exit Function
     End If
-    If Abs(e) >= xTol1 And Abs(fxa) > Abs(fsoln) Then
     
+    If Abs(e) >= xTol1 And Abs(fxa) > Abs(fsoln) Then
       'inverse quadratic interpolation
       s = fsoln / fxa
       If xa = xb Then
@@ -199,7 +203,6 @@ Public Function SolveX( _
       End If
       p = Abs(p)
       
-     
       If p < 0.5 * Application.WorksheetFunction.Min( _
             3 * xMid * q - Abs(xTol1 * q), _
             Abs(e * q) _
@@ -217,14 +220,18 @@ Public Function SolveX( _
       d = xMid
       e = d
     End If
+    
     xa = soln
     fxa = fsoln
+    
     If Abs(d) > xTol1 Then
       soln = soln + d
     Else
       soln = soln + sign(xTol1, xMid)
     End If
+    
     fsoln = RunFunctionX(FunctionName, soln, Arr)
+    
     Iter = Iter + 1
   Loop
   

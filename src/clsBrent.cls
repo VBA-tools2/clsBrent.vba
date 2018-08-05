@@ -20,7 +20,7 @@ Attribute VB_Exposed = False
 
 Option Explicit
 
-Private maxIterations_ As Single
+Private maxIterations_ As Long
 Private objectMode_ As Boolean
 Private callbackObject_ As Object
 Public Silent_ As Boolean
@@ -90,7 +90,7 @@ Public Function SolveX( _
     Optional Arr As Variant _
         ) As Double
     
-  Dim Iter As Single
+  Dim Iter As Long
   Dim e As Double
   Dim fxa As Double
   Dim fxb As Double

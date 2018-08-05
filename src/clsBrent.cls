@@ -119,8 +119,6 @@ Public Function SolveX( _
     Exit Function
   End If
   
-  Iter = 2
-  
   If fxa * fxb >= 0 Then
     TempStr = "root not bracketed: f[" & xa & "," & (xb) & "] -> [" & (fxa) & "," & (fxb) & "]"
     ShowMessageBox TempStr
@@ -156,12 +154,11 @@ Public Function SolveX( _
   d = 0
   e = 0
   
-  
+  Iter = 2
   soln = xb
   fsoln = fxb
   
-
-  Do While Iter <= maxIterations_
+  Do
     If (fsoln > 0 And fxb > 0) Or (fsoln < 0 And fxb < 0) Then
       xb = xa
       fxb = fxa
@@ -233,7 +230,7 @@ Public Function SolveX( _
     fsoln = RunFunctionX(FunctionName, soln, Arr)
     
     Iter = Iter + 1
-  Loop
+  Loop While Iter <= maxIterations_
   
 End Function
 

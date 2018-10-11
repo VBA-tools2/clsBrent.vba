@@ -26,6 +26,7 @@ Private pMaxIterations As Long
 Private pObjectMode As Boolean
 Private pCallbackObject As Object
 Private pSilent As Boolean
+Private pStatus As eBrentStatus
 Private pAccuracy As Double
 Private pGuess As Double
 Private pLowerBound As Double
@@ -37,6 +38,18 @@ Private pbFunctionNameSet As Boolean
 Private pbLowerBoundSet As Boolean
 Private pbUpperBoundSet As Boolean
 Private pbGuessSet As Boolean
+
+
+Public Enum eBrentStatus
+    ePrerequisitesNotMet = -2
+    ePrerequisitesMet
+    eNoError
+    eLowerBoundGreaterUpperBound
+    eNotBracketed
+    eGuessSmallerLowerBound
+    eGuessGreaterUpperBound
+    eMaxIterations
+End Enum
 
 
 Public Property Get MaxIterations() As Long
@@ -54,6 +67,11 @@ End Property
 
 Public Property Let CallbackObject(Value As Object)
     Set pCallbackObject = Value
+End Property
+
+
+Public Property Get Status() As eBrentStatus
+    Status = pStatus
 End Property
 
 
@@ -131,6 +149,14 @@ Public Property Get Solve() As Variant
     'initialize with an error value
     Solve = CVErr(xlErrValue)
     
+    'check if all prerequisites are fulfilled
+    If pStatus < ePrerequisitesMet Then Exit Property
+    If Not pbGuessSet Then _
+            pGuess = Application.WorksheetFunction.Average( _
+                    pLowerBound, pUpperBound _
+            )
+    pStatus = eNoError
+    
     'call function
     Solve = SolveX()
 End Property
@@ -142,6 +168,7 @@ Private Sub Class_Initialize()
     pMaxIterations = 100
     pObjectMode = False
     pSilent = True
+    pStatus = ePrerequisitesNotMet
     
     pAccuracy = 0.00001
 End Sub
@@ -175,6 +202,7 @@ Private Function SolveX() As Variant
     xb = pUpperBound
     
     If xa >= xb Then
+        pStatus = eLowerBoundGreaterUpperBound
         TempStr = "  error: invalid range: xa (" & xa & ") >= xb (" & xb & ")"
         ShowMessage TempStr
         Exit Function
@@ -182,6 +210,7 @@ Private Function SolveX() As Variant
     
     fxa = RunFunctionX(xa)
     If Abs(fxa) < pAccuracy Then
+        pStatus = eNoError
         SolveX = xa
         ShowMessage "  SolveX = xa = " & xa
         Exit Function
@@ -189,22 +218,26 @@ Private Function SolveX() As Variant
     
     fxb = RunFunctionX(xb)
     If Abs(fxb) < pAccuracy Then
+        pStatus = eNoError
         SolveX = xb
         ShowMessage "  SolveX = xb = " & xb
         Exit Function
     End If
     
     If fxa * fxb >= 0 Then
+        pStatus = eNotBracketed
         TempStr = "  error: root not bracketed: f[" & xa & ";" & xb & "] -> [" & fxa & ";" & fxb & "]"
         ShowMessage TempStr
         Exit Function
     End If
     If pGuess <= xa Then
+        pStatus = eGuessSmallerLowerBound
         TempStr = "  error: guess (" & pGuess & ") < xa (" & xa & ")"
         ShowMessage TempStr
         Exit Function
     End If
     If pGuess >= xb Then
+        pStatus = eGuessGreaterUpperBound
         TempStr = "  error: guess (" & pGuess & ") > xb (" & xb & ")"
         ShowMessage TempStr
         Exit Function
@@ -254,6 +287,7 @@ Private Function SolveX() As Variant
         
         'exit if function has converged
         If Abs(xMid) <= xTol1 Or fsoln = 0 Then
+            pStatus = eNoError
             SolveX = soln
             ShowMessage "  SolveX(" & Iter & ") = " & soln _
                     & vbTab & "(" & fsoln & ")"
@@ -309,6 +343,10 @@ Private Function SolveX() As Variant
         Iter = Iter + 1
     Loop While Iter <= pMaxIterations
     
+    pStatus = eMaxIterations
+    TempStr = "  error: max iterations = " & pMaxIterations & " reached."
+    ShowMessage TempStr
+    
 End Function
 
 
@@ -356,6 +394,17 @@ Private Function RunFunctionX( _
     End If
     
 End Function
+
+
+Private Sub CheckPrerequisites()
+    If pbLowerBoundSet And _
+            pbUpperBoundSet And _
+            pbFunctionNameSet _
+    Then
+        pStatus = ePrerequisitesMet
+    End If
+End Sub
+
 
 '==============================================================================
 

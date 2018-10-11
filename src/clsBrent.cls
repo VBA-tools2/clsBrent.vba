@@ -16,21 +16,134 @@ Attribute VB_Exposed = False
 '    which are now named
 '    - RunFunctionX
 '    - SolveX
+'also with some additions that were inspired from
+'<http://daft.engineer/hacks-and-kludges/numerical-methods-and-excel-vba/>
 '==============================================================================
 
 Option Explicit
 
-Private maxIterations_ As Long
-Private objectMode_ As Boolean
-Private callbackObject_ As Object
-Public Silent_ As Boolean
+Private pMaxIterations As Long
+Private pObjectMode As Boolean
+Private pCallbackObject As Object
+Private pSilent As Boolean
+Private pAccuracy As Double
+Private pGuess As Double
+Private pLowerBound As Double
+Private pUpperBound As Double
+Private pFunctionName As String
+Private pArr As Variant
 
+Private pbFunctionNameSet As Boolean
+Private pbLowerBoundSet As Boolean
+Private pbUpperBoundSet As Boolean
+Private pbGuessSet As Boolean
+
+
+Public Property Get MaxIterations() As Long
+    MaxIterations = pMaxIterations
+End Property
+
+Public Property Let MaxIterations(Value As Long)
+    pMaxIterations = Value
+End Property
+
+
+Public Property Get CallbackObject() As Object
+    Set CallbackObject = pCallbackObject
+End Property
+
+Public Property Let CallbackObject(Value As Object)
+    Set pCallbackObject = Value
+End Property
+
+
+Public Property Get Silent() As Boolean
+    Silent = pSilent
+End Property
+
+Public Property Let Silent(Value As Boolean)
+    pSilent = Value
+End Property
+
+
+Public Property Get Accuracy() As Double
+    Accuracy = pAccuracy
+End Property
+
+Public Property Let Accuracy(Value As Double)
+    pAccuracy = Value
+End Property
+
+
+Public Property Get Guess() As Double
+    Guess = pGuess
+End Property
+
+Public Property Let Guess(Value As Double)
+    pGuess = Value
+    pbGuessSet = True
+End Property
+
+
+Public Property Get LowerBound() As Double
+    LowerBound = pLowerBound
+End Property
+
+Public Property Let LowerBound(Value As Double)
+    pLowerBound = Value
+    pbLowerBoundSet = True
+    Call CheckPrerequisites
+End Property
+
+
+Public Property Get UpperBound() As Double
+    UpperBound = pUpperBound
+End Property
+
+Public Property Let UpperBound(Value As Double)
+    pUpperBound = Value
+    pbUpperBoundSet = True
+    Call CheckPrerequisites
+End Property
+
+
+Public Property Get Arr() As Variant
+    Arr = pArr
+End Property
+
+Public Property Let Arr(Value As Variant)
+    pArr = Value
+End Property
+
+
+Public Property Get FunctionName() As String
+    FunctionName = pFunctionName
+End Property
+
+Public Property Let FunctionName(Value As String)
+    pFunctionName = Value
+    pbFunctionNameSet = True
+    Call CheckPrerequisites
+End Property
+
+
+Public Property Get Solve() As Variant
+    'initialize with an error value
+    Solve = CVErr(xlErrValue)
+    
+    'call function
+    Solve = SolveX()
+End Property
+
+
+'------------------------------------------------------------------------------
 
 Private Sub Class_Initialize()
-    maxIterations_ = 100
-    objectMode_ = False
-'    Silent_ = False
-    Silent_ = True
+    pMaxIterations = 100
+    pObjectMode = False
+    pSilent = True
+    
+    pAccuracy = 0.00001
 End Sub
 
 
@@ -40,15 +153,10 @@ End Sub
 'number of arbitrary arguments that can be stored in 'Arr'
 '- xa = x_min
 '- xb = x_max
-Public Function SolveX( _
-    FunctionName As String, _
-    Accuracy As Double, _
-    Guess As Double, _
-    xa As Double, _
-    xb As Double, _
-    Optional Arr As Variant _
-        ) As Variant
+Private Function SolveX() As Variant
     
+    Dim xa As Double
+    Dim xb As Double
     Dim Iter As Long
     Dim e As Double
     Dim fxa As Double
@@ -58,10 +166,13 @@ Public Function SolveX( _
     Dim TempStr As String
     
     
-    ShowMessage FunctionName & vbTab & xa & vbTab & xb
+    ShowMessage pFunctionName & vbTab & pLowerBound & vbTab & pUpperBound
     
     'initialize with an error value
     SolveX = CVErr(xlErrValue)
+    
+    xa = pLowerBound
+    xb = pUpperBound
     
     If xa >= xb Then
         TempStr = "  error: invalid range: xa (" & xa & ") >= xb (" & xb & ")"
@@ -69,15 +180,15 @@ Public Function SolveX( _
         Exit Function
     End If
     
-    fxa = RunFunctionX(FunctionName, xa, Arr)
-    If Abs(fxa) < Accuracy Then
+    fxa = RunFunctionX(xa)
+    If Abs(fxa) < pAccuracy Then
         SolveX = xa
         ShowMessage "  SolveX = xa = " & xa
         Exit Function
     End If
     
-    fxb = RunFunctionX(FunctionName, xb, Arr)
-    If Abs(fxb) < Accuracy Then
+    fxb = RunFunctionX(xb)
+    If Abs(fxb) < pAccuracy Then
         SolveX = xb
         ShowMessage "  SolveX = xb = " & xb
         Exit Function
@@ -88,18 +199,18 @@ Public Function SolveX( _
         ShowMessage TempStr
         Exit Function
     End If
-    If Guess <= xa Then
-        TempStr = "  error: guess (" & Guess & ") < xa (" & xa & ")"
+    If pGuess <= xa Then
+        TempStr = "  error: guess (" & pGuess & ") < xa (" & xa & ")"
         ShowMessage TempStr
         Exit Function
     End If
-    If Guess >= xb Then
-        TempStr = "  error: guess (" & Guess & ") > xb (" & xb & ")"
+    If pGuess >= xb Then
+        TempStr = "  error: guess (" & pGuess & ") > xb (" & xb & ")"
         ShowMessage TempStr
         Exit Function
     End If
     
-    soln = Guess
+    soln = pGuess
     
     
     Dim fsoln As Double
@@ -138,7 +249,7 @@ Public Function SolveX( _
             fxb = fxa
         End If
         
-        xTol1 = 2 * Eps * Abs(soln) + 0.5 * Accuracy
+        xTol1 = 2 * Eps * Abs(soln) + 0.5 * pAccuracy
         xMid = 0.5 * (xb - soln)
         
         'exit if function has converged
@@ -193,55 +304,53 @@ Public Function SolveX( _
             soln = soln + sign(xTol1, xMid)
         End If
         
-        fsoln = RunFunctionX(FunctionName, soln, Arr)
+        fsoln = RunFunctionX(soln)
         
         Iter = Iter + 1
-    Loop While Iter <= maxIterations_
+    Loop While Iter <= pMaxIterations
     
 End Function
 
 
 'modified function (originally 'RunFunction') which can handle an optional
-'number of additional arguments that can be stored in 'Arr'
+'number of additional arguments that can be stored in 'pArr'
 Private Function RunFunctionX( _
-    FunctionName As String, _
-    x As Double, _
-    Optional Arr As Variant _
+    x As Double _
         ) As Double
     
-    If IsMissing(Arr) Then
-        If objectMode_ = False Then
-            RunFunctionX = Application.Run(FunctionName, x)
+    If IsEmpty(pArr) Then
+        If Not pObjectMode Then
+            RunFunctionX = Application.Run(pFunctionName, x)
         Else
-            RunFunctionX = CallByName(callbackObject_, FunctionName, VbMethod, x)
+            RunFunctionX = CallByName(pCallbackObject, pFunctionName, VbMethod, x)
         End If
     Else
-        Select Case UBound(Arr)
+        Select Case UBound(pArr)
             Case 2
-                If objectMode_ = False Then
-                    RunFunctionX = Application.Run(FunctionName, _
-                            x, Arr(0), Arr(1), Arr(2))
+                If Not pObjectMode Then
+                    RunFunctionX = Application.Run(pFunctionName, _
+                            x, pArr(0), pArr(1), pArr(2))
                 Else
-                    RunFunctionX = CallByName(callbackObject_, FunctionName, _
-                            VbMethod, x, Arr(0), Arr(1), Arr(2))
+                    RunFunctionX = CallByName(pCallbackObject, pFunctionName, _
+                            VbMethod, x, pArr(0), pArr(1), pArr(2))
                 End If
             Case 5
-                If objectMode_ = False Then
-                    RunFunctionX = Application.Run(FunctionName, _
-                            x, Arr(0), Arr(1), Arr(2), Arr(3), Arr(4), Arr(5))
+                If Not pObjectMode Then
+                    RunFunctionX = Application.Run(pFunctionName, _
+                            x, pArr(0), pArr(1), pArr(2), pArr(3), pArr(4), pArr(5))
                 Else
-                    RunFunctionX = CallByName(callbackObject_, FunctionName, _
-                            VbMethod, x, Arr(0), Arr(1), Arr(2), Arr(3), Arr(4), Arr(5))
+                    RunFunctionX = CallByName(pCallbackObject, pFunctionName, _
+                            VbMethod, x, pArr(0), pArr(1), pArr(2), pArr(3), pArr(4), pArr(5))
                 End If
             Case 7
-                If objectMode_ = False Then
-                    RunFunctionX = Application.Run(FunctionName, _
-                            x, Arr(0), Arr(1), Arr(2), Arr(3), Arr(4), Arr(5), _
-                            Arr(6), Arr(7))
+                If Not pObjectMode Then
+                    RunFunctionX = Application.Run(pFunctionName, _
+                            x, pArr(0), pArr(1), pArr(2), pArr(3), pArr(4), pArr(5), _
+                            pArr(6), pArr(7))
                 Else
-                    RunFunctionX = CallByName(callbackObject_, FunctionName, _
-                            VbMethod, x, Arr(0), Arr(1), Arr(2), Arr(3), Arr(4), Arr(5), _
-                            Arr(6), Arr(7))
+                    RunFunctionX = CallByName(pCallbackObject, pFunctionName, _
+                            VbMethod, x, pArr(0), pArr(1), pArr(2), pArr(3), pArr(4), pArr(5), _
+                            pArr(6), pArr(7))
                 End If
         End Select
     End If
@@ -250,19 +359,20 @@ End Function
 
 '==============================================================================
 
-Public Sub ShowMessage(Msg As String)
-    If Silent_ = False Then
+Private Sub ShowMessage(Msg As String)
+    If Not pSilent Then
         Debug.Print Msg
     End If
 End Sub
 
-Public Sub AssignObject(callbackObject As Object)
-    objectMode_ = True
-    Set callbackObject_ = callbackObject
+
+Public Sub AssignObject(CallbackObject As Object)
+    pObjectMode = True
+    Set pCallbackObject = CallbackObject
 End Sub
 
 
-Public Function sign(a As Double, b As Double) As Double
+Private Function sign(a As Double, b As Double) As Double
     If b >= 0 Then
         sign = Abs(a)
     Else

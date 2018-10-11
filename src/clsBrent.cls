@@ -27,10 +27,10 @@ Public Silent_ As Boolean
 
 
 Private Sub Class_Initialize()
-  maxIterations_ = 100
-  objectMode_ = False
-'  Silent_ = False
-  Silent_ = True
+    maxIterations_ = 100
+    objectMode_ = False
+'    Silent_ = False
+    Silent_ = True
 End Sub
 
 
@@ -49,155 +49,155 @@ Public Function SolveX( _
     Optional Arr As Variant _
         ) As Variant
     
-  Dim Iter As Long
-  Dim e As Double
-  Dim fxa As Double
-  Dim fxb As Double
-  Dim soln As Double
-  
-  Dim TempStr As String
-  
-  
-  ShowMessage FunctionName & vbTab & xa & vbTab & xb
-  
-  'initialize with an error value
-  SolveX = CVErr(xlErrValue)
-  
-  If xa >= xb Then
-    TempStr = "  error: invalid range: xa (" & xa & ") >= xb (" & xb & ")"
-    ShowMessage TempStr
-    Exit Function
-  End If
-  
-  fxa = RunFunctionX(FunctionName, xa, Arr)
-  If Abs(fxa) < Accuracy Then
-    SolveX = xa
-    ShowMessage "  SolveX = xa = " & xa
-    Exit Function
-  End If
-  
-  fxb = RunFunctionX(FunctionName, xb, Arr)
-  If Abs(fxb) < Accuracy Then
-    SolveX = xb
-    ShowMessage "  SolveX = xb = " & xb
-    Exit Function
-  End If
-  
-  If fxa * fxb >= 0 Then
-    TempStr = "  error: root not bracketed: f[" & xa & ";" & xb & "] -> [" & fxa & ";" & fxb & "]"
-    ShowMessage TempStr
-    Exit Function
-  End If
-  If Guess <= xa Then
-    TempStr = "  error: guess (" & Guess & ") < xa (" & xa & ")"
-    ShowMessage TempStr
-    Exit Function
-  End If
-  If Guess >= xb Then
-    TempStr = "  error: guess (" & Guess & ") > xb (" & xb & ")"
-    ShowMessage TempStr
-    Exit Function
-  End If
-  
-  soln = Guess
-  
-  
-  Dim fsoln As Double
-  Dim p As Double
-  Dim q As Double
-  Dim r As Double
-  Dim s As Double
-  Dim xTol1 As Double
-  Dim xMid As Double
-  Dim d As Double
-  
-  '============================================================================
-  Const Eps As Double = 2 ^ -52
-  '============================================================================
-  
-  d = 0
-  e = 0
-  
-  Iter = 2
-  soln = xb
-  fsoln = fxb
-  
-  Do
-    If (fsoln > 0 And fxb > 0) Or (fsoln < 0 And fxb < 0) Then
-      xb = xa
-      fxb = fxa
-      d = soln - xa
-      e = d
-    End If
-    If Abs(fxb) < Abs(fsoln) Then
-      xa = soln
-      soln = xb
-      xb = xa
-      fxa = fsoln
-      fsoln = fxb
-      fxb = fxa
+    Dim Iter As Long
+    Dim e As Double
+    Dim fxa As Double
+    Dim fxb As Double
+    Dim soln As Double
+    
+    Dim TempStr As String
+    
+    
+    ShowMessage FunctionName & vbTab & xa & vbTab & xb
+    
+    'initialize with an error value
+    SolveX = CVErr(xlErrValue)
+    
+    If xa >= xb Then
+        TempStr = "  error: invalid range: xa (" & xa & ") >= xb (" & xb & ")"
+        ShowMessage TempStr
+        Exit Function
     End If
     
-    xTol1 = 2 * Eps * Abs(soln) + 0.5 * Accuracy
-    xMid = 0.5 * (xb - soln)
-    
-    'exit if function has converged
-    If Abs(xMid) <= xTol1 Or fsoln = 0 Then
-      SolveX = soln
-      ShowMessage "  SolveX(" & Iter & ") = " & soln _
-            & vbTab & "(" & fsoln & ")"
-      Exit Function
+    fxa = RunFunctionX(FunctionName, xa, Arr)
+    If Abs(fxa) < Accuracy Then
+        SolveX = xa
+        ShowMessage "  SolveX = xa = " & xa
+        Exit Function
     End If
     
-    If Abs(e) >= xTol1 And Abs(fxa) > Abs(fsoln) Then
-      'inverse quadratic interpolation
-      s = fsoln / fxa
-      If xa = xb Then
-        p = 2 * xMid * s
-        q = 1 - s
-      Else
-        q = fxa / fxb
-        r = fsoln / fxb
-        p = s * (2 * xMid * q * (q - r) - (soln - xa) * (r - 1))
-        q = (q - 1) * (r - 1) * (s - 1)
-      End If
-      If p > 0 Then
-        q = -q
-      End If
-      p = Abs(p)
-      
-      If p < 0.5 * Application.WorksheetFunction.Min( _
-            3 * xMid * q - Abs(xTol1 * q), _
-            Abs(e * q) _
-      ) Then
-        'secant method is fast so consider interpolation
-        e = d
-        d = p / q
-      Else
-        'bisection step is considered since the secant method is not progressing fast
-        d = xMid
-        e = d
-      End If
-    Else
-      'bounds decreasing too slowly, use bisection
-      d = xMid
-      e = d
+    fxb = RunFunctionX(FunctionName, xb, Arr)
+    If Abs(fxb) < Accuracy Then
+        SolveX = xb
+        ShowMessage "  SolveX = xb = " & xb
+        Exit Function
     End If
     
-    xa = soln
-    fxa = fsoln
-    
-    If Abs(d) > xTol1 Then
-      soln = soln + d
-    Else
-      soln = soln + sign(xTol1, xMid)
+    If fxa * fxb >= 0 Then
+        TempStr = "  error: root not bracketed: f[" & xa & ";" & xb & "] -> [" & fxa & ";" & fxb & "]"
+        ShowMessage TempStr
+        Exit Function
+    End If
+    If Guess <= xa Then
+        TempStr = "  error: guess (" & Guess & ") < xa (" & xa & ")"
+        ShowMessage TempStr
+        Exit Function
+    End If
+    If Guess >= xb Then
+        TempStr = "  error: guess (" & Guess & ") > xb (" & xb & ")"
+        ShowMessage TempStr
+        Exit Function
     End If
     
-    fsoln = RunFunctionX(FunctionName, soln, Arr)
+    soln = Guess
     
-    Iter = Iter + 1
-  Loop While Iter <= maxIterations_
-  
+    
+    Dim fsoln As Double
+    Dim p As Double
+    Dim q As Double
+    Dim r As Double
+    Dim s As Double
+    Dim xTol1 As Double
+    Dim xMid As Double
+    Dim d As Double
+    
+    '==========================================================================
+    Const Eps As Double = 2 ^ -52
+    '==========================================================================
+    
+    d = 0
+    e = 0
+    
+    Iter = 2
+    soln = xb
+    fsoln = fxb
+    
+    Do
+        If (fsoln > 0 And fxb > 0) Or (fsoln < 0 And fxb < 0) Then
+            xb = xa
+            fxb = fxa
+            d = soln - xa
+            e = d
+        End If
+        If Abs(fxb) < Abs(fsoln) Then
+            xa = soln
+            soln = xb
+            xb = xa
+            fxa = fsoln
+            fsoln = fxb
+            fxb = fxa
+        End If
+        
+        xTol1 = 2 * Eps * Abs(soln) + 0.5 * Accuracy
+        xMid = 0.5 * (xb - soln)
+        
+        'exit if function has converged
+        If Abs(xMid) <= xTol1 Or fsoln = 0 Then
+            SolveX = soln
+            ShowMessage "  SolveX(" & Iter & ") = " & soln _
+                    & vbTab & "(" & fsoln & ")"
+            Exit Function
+        End If
+        
+        If Abs(e) >= xTol1 And Abs(fxa) > Abs(fsoln) Then
+            'inverse quadratic interpolation
+            s = fsoln / fxa
+            If xa = xb Then
+                p = 2 * xMid * s
+                q = 1 - s
+            Else
+                q = fxa / fxb
+                r = fsoln / fxb
+                p = s * (2 * xMid * q * (q - r) - (soln - xa) * (r - 1))
+                q = (q - 1) * (r - 1) * (s - 1)
+            End If
+            If p > 0 Then
+                q = -q
+            End If
+            p = Abs(p)
+            
+            If p < 0.5 * Application.WorksheetFunction.Min( _
+                    3 * xMid * q - Abs(xTol1 * q), _
+                    Abs(e * q) _
+            ) Then
+                'secant method is fast so consider interpolation
+                e = d
+                d = p / q
+            Else
+                'bisection step is considered since the secant method is not progressing fast
+                d = xMid
+                e = d
+            End If
+        Else
+            'bounds decreasing too slowly, use bisection
+            d = xMid
+            e = d
+        End If
+        
+        xa = soln
+        fxa = fsoln
+        
+        If Abs(d) > xTol1 Then
+            soln = soln + d
+        Else
+            soln = soln + sign(xTol1, xMid)
+        End If
+        
+        fsoln = RunFunctionX(FunctionName, soln, Arr)
+        
+        Iter = Iter + 1
+    Loop While Iter <= maxIterations_
+    
 End Function
 
 
@@ -223,7 +223,7 @@ Private Function RunFunctionX( _
                             x, Arr(0), Arr(1), Arr(2))
                 Else
                     RunFunctionX = CallByName(callbackObject_, FunctionName, _
-                        VbMethod, x, Arr(0), Arr(1), Arr(2))
+                            VbMethod, x, Arr(0), Arr(1), Arr(2))
                 End If
             Case 5
                 If objectMode_ = False Then
@@ -231,7 +231,7 @@ Private Function RunFunctionX( _
                             x, Arr(0), Arr(1), Arr(2), Arr(3), Arr(4), Arr(5))
                 Else
                     RunFunctionX = CallByName(callbackObject_, FunctionName, _
-                        VbMethod, x, Arr(0), Arr(1), Arr(2), Arr(3), Arr(4), Arr(5))
+                            VbMethod, x, Arr(0), Arr(1), Arr(2), Arr(3), Arr(4), Arr(5))
                 End If
             Case 7
                 If objectMode_ = False Then
@@ -240,8 +240,8 @@ Private Function RunFunctionX( _
                             Arr(6), Arr(7))
                 Else
                     RunFunctionX = CallByName(callbackObject_, FunctionName, _
-                        VbMethod, x, Arr(0), Arr(1), Arr(2), Arr(3), Arr(4), Arr(5), _
-                        Arr(6), Arr(7))
+                            VbMethod, x, Arr(0), Arr(1), Arr(2), Arr(3), Arr(4), Arr(5), _
+                            Arr(6), Arr(7))
                 End If
         End Select
     End If
@@ -251,21 +251,21 @@ End Function
 '==============================================================================
 
 Public Sub ShowMessage(Msg As String)
-  If Silent_ = False Then
-    Debug.Print Msg
-  End If
+    If Silent_ = False Then
+        Debug.Print Msg
+    End If
 End Sub
 
 Public Sub AssignObject(callbackObject As Object)
-  objectMode_ = True
-  Set callbackObject_ = callbackObject
+    objectMode_ = True
+    Set callbackObject_ = callbackObject
 End Sub
 
 
 Public Function sign(a As Double, b As Double) As Double
-  If b >= 0 Then
-    sign = Abs(a)
-  Else
-    sign = -Abs(a)
-  End If
+    If b >= 0 Then
+        sign = Abs(a)
+    Else
+        sign = -Abs(a)
+    End If
 End Function

@@ -61,7 +61,7 @@ Public Property Get MaxIterations() As Long
     MaxIterations = This.MaxIterations
 End Property
 
-Public Property Let MaxIterations(Value As Long)
+Public Property Let MaxIterations(ByVal Value As Long)
     This.MaxIterations = Value
 End Property
 
@@ -70,7 +70,7 @@ Public Property Get CallbackObject() As Object
     Set CallbackObject = This.CallbackObject
 End Property
 
-Public Property Let CallbackObject(Value As Object)
+Public Property Let CallbackObject(ByVal Value As Object)
     Set This.CallbackObject = Value
 End Property
 
@@ -84,7 +84,7 @@ Public Property Get Silent() As Boolean
     Silent = This.Silent
 End Property
 
-Public Property Let Silent(Value As Boolean)
+Public Property Let Silent(ByVal Value As Boolean)
     This.Silent = Value
 End Property
 
@@ -93,7 +93,7 @@ Public Property Get Accuracy() As Double
     Accuracy = This.Accuracy
 End Property
 
-Public Property Let Accuracy(Value As Double)
+Public Property Let Accuracy(ByVal Value As Double)
     This.Accuracy = Value
 End Property
 
@@ -102,7 +102,7 @@ Public Property Get Guess() As Double
     Guess = This.Guess
 End Property
 
-Public Property Let Guess(Value As Double)
+Public Property Let Guess(ByVal Value As Double)
     With This
         .Guess = Value
         .bGuessSet = True
@@ -114,7 +114,7 @@ Public Property Get LowerBound() As Double
     LowerBound = This.LowerBound
 End Property
 
-Public Property Let LowerBound(Value As Double)
+Public Property Let LowerBound(ByVal Value As Double)
     With This
         .LowerBound = Value
         .bLowerBoundSet = True
@@ -127,7 +127,7 @@ Public Property Get UpperBound() As Double
     UpperBound = This.UpperBound
 End Property
 
-Public Property Let UpperBound(Value As Double)
+Public Property Let UpperBound(ByVal Value As Double)
     With This
         .UpperBound = Value
         .bUpperBoundSet = True
@@ -140,7 +140,7 @@ Public Property Get Arr() As Variant
     Arr = This.Arr
 End Property
 
-Public Property Let Arr(Value As Variant)
+Public Property Let Arr(ByVal Value As Variant)
     This.Arr = Value
 End Property
 
@@ -149,7 +149,7 @@ Public Property Get FunctionName() As String
     FunctionName = This.FunctionName
 End Property
 
-Public Property Let FunctionName(Value As String)
+Public Property Let FunctionName(ByVal Value As String)
     With This
         .FunctionName = Value
         .bFunctionNameSet = True
@@ -372,7 +372,7 @@ End Function
 'modified function (originally 'RunFunction') which can handle an optional
 'number of additional arguments that can be stored in 'This.Arr'
 Private Function RunFunctionX( _
-    x As Double _
+    ByVal x As Double _
         ) As Double
     
     With This
@@ -432,14 +432,14 @@ End Sub
 
 '==============================================================================
 
-Private Sub ShowMessage(Msg As String)
+Private Sub ShowMessage(ByVal Msg As String)
     If Not This.Silent Then
         Debug.Print Msg
     End If
 End Sub
 
 
-Public Sub AssignObject(CallbackObject As Object)
+Public Sub AssignObject(ByVal CallbackObject As Object)
     With This
         .ObjectMode = True
         Set .CallbackObject = CallbackObject
@@ -447,7 +447,7 @@ Public Sub AssignObject(CallbackObject As Object)
 End Sub
 
 
-Private Function sign(a As Double, b As Double) As Double
+Private Function sign(ByVal a As Double, ByVal b As Double) As Double
     If b >= 0 Then
         sign = Abs(a)
     Else

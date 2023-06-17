@@ -367,12 +367,13 @@ End Function
 
 
 'modified function (originally 'RunFunction') which can handle an optional
-'number of additional arguments that can be stored in 'This.Arr'
+'number of additional arguments that can be stored in 'Arr'
 Private Function RunFunctionX( _
     ByVal x As Double _
         ) As Double
     
     With This
+        '(otherwise it is hard to create/set '.Arr' in 'ResizeArr')
         If IsEmpty(.Arr) Then
             If Not .ObjectMode Then
                 RunFunctionX = Application.Run(.FunctionName, x)
@@ -380,39 +381,47 @@ Private Function RunFunctionX( _
                 RunFunctionX = CallByName(.CallbackObject, .FunctionName, VbMethod, x)
             End If
         Else
-            Select Case UBound(.Arr)
-                Case 2
-                    If Not .ObjectMode Then
-                        RunFunctionX = Application.Run(.FunctionName, _
-                                x, .Arr(0), .Arr(1), .Arr(2))
-                    Else
-                        RunFunctionX = CallByName(.CallbackObject, .FunctionName, _
-                                VbMethod, x, .Arr(0), .Arr(1), .Arr(2))
-                    End If
-                Case 5
-                    If Not .ObjectMode Then
-                        RunFunctionX = Application.Run(.FunctionName, _
-                                x, .Arr(0), .Arr(1), .Arr(2), .Arr(3), .Arr(4), .Arr(5))
-                    Else
-                        RunFunctionX = CallByName(.CallbackObject, .FunctionName, _
-                                VbMethod, x, .Arr(0), .Arr(1), .Arr(2), .Arr(3), .Arr(4), _
-                                .Arr(5))
-                    End If
-                Case 7
-                    If Not .ObjectMode Then
-                        RunFunctionX = Application.Run(.FunctionName, _
-                                x, .Arr(0), .Arr(1), .Arr(2), .Arr(3), .Arr(4), .Arr(5), _
-                                .Arr(6), .Arr(7))
-                    Else
-                        RunFunctionX = CallByName(.CallbackObject, .FunctionName, _
-                                VbMethod, x, .Arr(0), .Arr(1), .Arr(2), .Arr(3), .Arr(4), _
-                                .Arr(5), .Arr(6), .Arr(7))
-                    End If
-            End Select
+            ResizeArr
+            
+            If Not .ObjectMode Then
+                RunFunctionX = Application.Run(.FunctionName, x, _
+                        .Arr(0), .Arr(1), .Arr(2), .Arr(3), .Arr(4), _
+                        .Arr(5), .Arr(6), .Arr(7), .Arr(8), .Arr(9))
+            Else
+                RunFunctionX = CallByName(.CallbackObject, .FunctionName, VbMethod, x, _
+                        .Arr(0), .Arr(1), .Arr(2), .Arr(3), .Arr(4), _
+                        .Arr(5), .Arr(6), .Arr(7), .Arr(8), .Arr(9))
+            End If
         End If
     End With
     
 End Function
+
+
+'REF: <https://github.com/cristianbuse/Excel-VBA-ProgressBar/blob/c0f862c0f904ac0b9992eba6dee7734ccc7f66fe/src/ProgressBar.cls#L544-L552>
+Private Sub ResizeArr(Optional ByVal Missing As Variant)
+    
+    '==========================================================================
+    'maximum allowed number of 'Arr' arguments
+    '(keep in sync with number of '.Arr' arguments in 'RunFunctionX')
+    Const MaxArgs As Long = 10
+    '==========================================================================
+    
+    With This
+        If IsMissing(.Arr) Then Exit Sub
+        
+        Dim ArgCount As Long
+        ArgCount = UBound(.Arr)
+        
+        ReDim Preserve .Arr(0 To MaxArgs - 1)
+        
+        Dim i As Long
+        For i = ArgCount + 1 To UBound(.Arr)
+            .Arr(i) = Missing
+        Next
+    End With
+    
+End Sub
 
 
 Private Sub CheckPrerequisites()

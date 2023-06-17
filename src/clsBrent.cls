@@ -119,7 +119,7 @@ Public Property Let LowerBound(ByVal Value As Double)
         .LowerBound = Value
         .bLowerBoundSet = True
     End With
-    Call CheckPrerequisites
+    CheckPrerequisites
 End Property
 
 
@@ -132,7 +132,7 @@ Public Property Let UpperBound(ByVal Value As Double)
         .UpperBound = Value
         .bUpperBoundSet = True
     End With
-    Call CheckPrerequisites
+    CheckPrerequisites
 End Property
 
 
@@ -154,7 +154,7 @@ Public Property Let FunctionName(ByVal Value As String)
         .FunctionName = Value
         .bFunctionNameSet = True
     End With
-    Call CheckPrerequisites
+    CheckPrerequisites
 End Property
 
 

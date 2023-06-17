@@ -261,9 +261,6 @@ Private Function SolveX() As Variant
             Exit Function
         End If
         
-        soln = .Guess
-        
-        
         Dim fsoln As Double
         Dim p As Double
         Dim q As Double
@@ -281,8 +278,8 @@ Private Function SolveX() As Variant
         e = 0
         
         Iter = 2
-        soln = xb
-        fsoln = fxb
+        soln = .Guess
+        fsoln = RunFunctionX(soln)
         
         Do
             If (fsoln > 0 And fxb > 0) Or (fsoln < 0 And fxb < 0) Then

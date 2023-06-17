@@ -85,3 +85,21 @@ Public Function Parabola_Vertex_RightRoot( _
     Parabola_Vertex_RightRoot = (-b + Sqr(b ^ 2 - 4 * a * c)) / 2 / a
     
 End Function
+
+
+'==============================================================================
+Public Function DummyFunctionWithTenAdditionalArguments( _
+    ByVal x As Double, _
+    ByVal arg0 As Double, _
+    ByVal arg1 As Double, _
+    ByVal arg2 As Double, _
+    ByVal arg3 As Double, _
+    ByVal arg4 As Double, _
+    ByVal arg5 As Double, _
+    ByVal arg6 As Double, _
+    ByVal arg7 As Double, _
+    ByVal arg8 As Double, _
+    ByVal arg9 As Double _
+        ) As Double
+    DummyFunctionWithTenAdditionalArguments = 0
+End Function

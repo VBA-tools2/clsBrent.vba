@@ -46,6 +46,8 @@ Private Type TBrent
     bCustomArrBounds As Boolean
     LowerArrBound As Long
     UpperArrBound As Long
+    
+    MaxArgs As Long
 End Type
 Private This As TBrent
 
@@ -59,6 +61,13 @@ Public Enum eBrentStatus
     eGuessSmallerLowerBound
     eGuessGreaterUpperBound
     eMaxIterations
+End Enum
+
+
+Public Enum eBrentError
+    [_First] = vbObjectError + 1
+    ErrMoreThanMaxArgs
+    [_Last] = ErrMoreThanMaxArgs
 End Enum
 
 
@@ -170,11 +179,15 @@ Public Property Let Arr(ByVal Value As Variant)
             ReDim .Arr(0 To 0)
             .Arr(0) = Value
         ElseIf LBound(Value) = 0 Then
+            If UBound(Value) >= .MaxArgs Then RaiseErrorMoreThanMaxArgs
+            
             .Arr = Value
         Else
             .bCustomArrBounds = True
             .LowerArrBound = LBound(Value)
             .UpperArrBound = UBound(Value)
+            
+            If .UpperArrBound - .LowerArrBound + 1 > .MaxArgs Then RaiseErrorMoreThanMaxArgs
             
             ReDim .Arr(0 To .UpperArrBound - .LowerArrBound)
             
@@ -229,6 +242,12 @@ Private Sub Class_Initialize()
         .Status = ePrerequisitesNotMet
         
         .Accuracy = 0.00001
+        
+        '======================================================================
+        'maximum allowed number of 'Arr' arguments
+        '(keep in sync with number of '.Arr' arguments in 'RunFunctionX')
+        .MaxArgs = 10
+        '======================================================================
     End With
 End Sub
 
@@ -443,19 +462,13 @@ End Function
 'REF: <https://github.com/cristianbuse/Excel-VBA-ProgressBar/blob/c0f862c0f904ac0b9992eba6dee7734ccc7f66fe/src/ProgressBar.cls#L544-L552>
 Private Sub ResizeArr(Optional ByVal Missing As Variant)
     
-    '==========================================================================
-    'maximum allowed number of 'Arr' arguments
-    '(keep in sync with number of '.Arr' arguments in 'RunFunctionX')
-    Const MaxArgs As Long = 10
-    '==========================================================================
-    
     With This
         If IsMissing(.Arr) Then Exit Sub
         
         Dim ArgCount As Long
         ArgCount = UBound(.Arr)
         
-        ReDim Preserve .Arr(0 To MaxArgs - 1)
+        ReDim Preserve .Arr(0 To .MaxArgs - 1)
         
         Dim i As Long
         For i = ArgCount + 1 To UBound(.Arr)
@@ -502,3 +515,14 @@ Private Function sign(ByVal a As Double, ByVal b As Double) As Double
         sign = -Abs(a)
     End If
 End Function
+
+
+'==============================================================================
+Private Sub RaiseErrorMoreThanMaxArgs()
+    Err.Raise _
+            Source:=TypeName(Me), _
+            Number:=eBrentError.ErrMoreThanMaxArgs, _
+            Description:= _
+                    "Currently only " & This.MaxArgs & " additional " & _
+                    "arguments are allowed/supported."
+End Sub

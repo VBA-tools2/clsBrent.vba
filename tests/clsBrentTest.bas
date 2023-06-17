@@ -826,3 +826,65 @@ TestExit:
 TestFail:
     Assert.Fail "Test raised an error: #" & Err.Number & " - " & Err.Description
 End Sub
+
+
+'@TestMethod("SolveX")
+Private Sub SolveX_ArrWithMoreThanTenElements_ThrowsError()
+    Const ExpectedError As Long = eBrentError.ErrMoreThanMaxArgs
+    On Error GoTo TestFail
+    
+    'Arrange:
+    Set Brent = New clsBrent
+    Dim Arr(0 To 10) As Variant
+    
+    'Act:
+    With Brent
+        .LowerBound = -1
+        .UpperBound = 1
+        .FunctionName = sThisWorkbook & "DummyFunctionWithTenAdditionalArguments"
+        .Arr = Arr
+    End With
+    
+Assert:
+    Assert.Fail "Expected error was not raised"
+
+TestExit:
+    Exit Sub
+TestFail:
+    If Err.Number = ExpectedError Then
+        Resume TestExit
+    Else
+        Resume Assert
+    End If
+End Sub
+
+
+'@TestMethod("SolveX")
+Private Sub SolveX_ArrWithMoreThanTenElementsAndLowerBoundSmallerZero_ThrowsError()
+    Const ExpectedError As Long = eBrentError.ErrMoreThanMaxArgs
+    On Error GoTo TestFail
+    
+    'Arrange:
+    Set Brent = New clsBrent
+    Dim Arr(-5 To 5) As Variant
+    
+    'Act:
+    With Brent
+        .LowerBound = -1
+        .UpperBound = 1
+        .FunctionName = sThisWorkbook & "DummyFunctionWithTenAdditionalArguments"
+        .Arr = Arr
+    End With
+    
+Assert:
+    Assert.Fail "Expected error was not raised"
+
+TestExit:
+    Exit Sub
+TestFail:
+    If Err.Number = ExpectedError Then
+        Resume TestExit
+    Else
+        Resume Assert
+    End If
+End Sub

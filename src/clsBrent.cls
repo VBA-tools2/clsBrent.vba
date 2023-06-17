@@ -42,6 +42,7 @@ Private Type TBrent
     bUpperBoundSet As Boolean
     bGuessSet As Boolean
     
+    bScalarArr As Boolean
     bCustomArrBounds As Boolean
     LowerArrBound As Long
     UpperArrBound As Long
@@ -142,7 +143,12 @@ End Property
 
 Public Property Get Arr() As Variant
     With This
-        If .bCustomArrBounds Then
+        If .bScalarArr Then
+            Dim ScalarArr As Variant
+            ScalarArr = .Arr(0)
+            
+            Arr = ScalarArr
+        ElseIf .bCustomArrBounds Then
             Dim ResultArr As Variant
             ReDim ResultArr(.LowerArrBound To .UpperArrBound)
             
@@ -159,7 +165,11 @@ End Property
 
 Public Property Let Arr(ByVal Value As Variant)
     With This
-        If LBound(Value) = 0 Then
+        If Not IsArray(Value) Then
+            .bScalarArr = True
+            ReDim .Arr(0 To 0)
+            .Arr(0) = Value
+        ElseIf LBound(Value) = 0 Then
             .Arr = Value
         Else
             .bCustomArrBounds = True

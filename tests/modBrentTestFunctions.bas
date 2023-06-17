@@ -4,6 +4,10 @@ Attribute VB_Name = "modBrentTestFunctions"
 
 Option Explicit
 
+Private Const defaultA As Double = 1
+Private Const defaultX0 As Double = -2
+Private Const defaultY0 As Double = -4
+
 
 Public Function Parabola_Vertex( _
     ByVal x As Double, _
@@ -13,13 +17,13 @@ Public Function Parabola_Vertex( _
         ) As Double
     
     If IsMissing(a) Or IsEmpty(a) Then
-        a = 1
+        a = defaultA
     End If
     If IsMissing(x0) Or IsEmpty(x0) Then
-        x0 = 0
+        x0 = defaultX0
     End If
     If IsMissing(y0) Or IsEmpty(y0) Then
-        y0 = 0
+        y0 = defaultY0
     End If
     
     Parabola_Vertex = a * (x - x0) ^ 2 + y0
@@ -38,13 +42,13 @@ Public Function Parabola_Vertex_LeftRoot( _
     
     
     If IsMissing(a) Or IsEmpty(a) Then
-        a = 1
+        a = defaultA
     End If
     If IsMissing(x0) Or IsEmpty(x0) Then
-        x0 = 0
+        x0 = defaultX0
     End If
     If IsMissing(y0) Or IsEmpty(y0) Then
-        y0 = 0
+        y0 = defaultY0
     End If
     
     b = -2 * a * x0
@@ -66,13 +70,13 @@ Public Function Parabola_Vertex_RightRoot( _
     
     
     If IsMissing(a) Or IsEmpty(a) Then
-        a = 1
+        a = defaultA
     End If
     If IsMissing(x0) Or IsEmpty(x0) Then
-        x0 = 0
+        x0 = defaultX0
     End If
     If IsMissing(y0) Or IsEmpty(y0) Then
-        y0 = 0
+        y0 = defaultY0
     End If
     
     b = -2 * a * x0

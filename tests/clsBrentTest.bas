@@ -789,3 +789,40 @@ TestExit:
 TestFail:
     Assert.Fail "Test raised an error: #" & Err.Number & " - " & Err.Description
 End Sub
+
+
+'@TestMethod("SolveX")
+Public Sub SolveX_ScalarArrEntry_ReturnsLeftRoot()
+    On Error GoTo TestFail
+    
+    'Arrange:
+    Set Brent = New clsBrent
+    
+    '==========================================================================
+    Const a As Double = 1
+    '==========================================================================
+    
+    'Act:
+    Expected = Parabola_Vertex_LeftRoot(a)
+    With Brent
+        .Guess = -5
+        .LowerBound = -6
+        .UpperBound = -1
+        .FunctionName = sThisWorkbook & "Parabola_Vertex"
+        .Arr = a
+        Actual = .Solve
+        
+        Dim ReturnArr As Double
+        ReturnArr = .Arr
+    End With
+    
+    'Assert:
+    Assert.AreEqual eBrentStatus.eNoError, Brent.Status, "Test of Status"
+    Assert.IsTrue RealEqual(Expected, Actual), "Test of Result Value"
+    Assert.AreEqual a, ReturnArr, "Test of ReturnArr"
+    
+TestExit:
+    Exit Sub
+TestFail:
+    Assert.Fail "Test raised an error: #" & Err.Number & " - " & Err.Description
+End Sub

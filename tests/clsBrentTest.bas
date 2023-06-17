@@ -677,3 +677,115 @@ TestExit:
 TestFail:
     Assert.Fail "Test raised an error: #" & Err.Number & " - " & Err.Description
 End Sub
+
+
+'@TestMethod("SolveX")
+Public Sub SolveX_ArrWithLowerBoundGreaterZero_ReturnsLeftRoot()
+    On Error GoTo TestFail
+    
+    'Arrange:
+    Set Brent = New clsBrent
+    
+    '==========================================================================
+    Const a As Double = 1
+    Const x0 As Double = 1
+    Const y0 As Double = -1
+    '==========================================================================
+    
+    Dim Arr(5 To 7) As Variant
+    Arr(5) = a
+    Arr(6) = x0
+    Arr(7) = y0
+    
+    'Act:
+    Expected = Parabola_Vertex_LeftRoot(a, x0, y0)
+    With Brent
+        .Guess = -1.5
+        .LowerBound = -2
+        .UpperBound = 1
+        .FunctionName = sThisWorkbook & "Parabola_Vertex"
+        .Arr = Arr
+        Actual = .Solve
+    End With
+    
+    'Assert:
+    Assert.AreEqual eBrentStatus.eNoError, Brent.Status, "Test of Status"
+    Assert.IsTrue RealEqual(Expected, Actual), "Test of Result Value"
+    
+TestExit:
+    Exit Sub
+TestFail:
+    Assert.Fail "Test raised an error: #" & Err.Number & " - " & Err.Description
+End Sub
+
+
+'@TestMethod("SolveX")
+Public Sub SolveX_ArrWithLowerBoundGreaterZero_ReturnsArr()
+    On Error GoTo TestFail
+    
+    'Arrange:
+    Set Brent = New clsBrent
+    
+    '==========================================================================
+    Const a As Double = 1
+    Const x0 As Double = 1
+    Const y0 As Double = -1
+    '==========================================================================
+    
+    Dim Arr(5 To 7) As Variant
+    Arr(5) = a
+    Arr(6) = x0
+    Arr(7) = y0
+    
+    'Act:
+    With Brent
+        .Arr = Arr
+        
+        Dim ReturnArr As Variant
+        ReturnArr = .Arr
+    End With
+    
+    'Assert:
+    Assert.SequenceEquals Arr, ReturnArr
+    
+TestExit:
+    Exit Sub
+TestFail:
+    Assert.Fail "Test raised an error: #" & Err.Number & " - " & Err.Description
+End Sub
+
+
+'@TestMethod("SolveX")
+Public Sub SolveX_ArrWithLowerBoundQualZero_ReturnsArr()
+    On Error GoTo TestFail
+    
+    'Arrange:
+    Set Brent = New clsBrent
+    
+    '==========================================================================
+    Const a As Double = 1
+    Const x0 As Double = 1
+    Const y0 As Double = -1
+    '==========================================================================
+    
+    Dim Arr(0 To 2) As Variant
+    Arr(0) = a
+    Arr(1) = x0
+    Arr(2) = y0
+    
+    'Act:
+    With Brent
+        .Arr = Arr
+        
+        Dim ReturnArr As Variant
+        ReturnArr = .Arr
+    End With
+    
+    'Assert:
+    Assert.SequenceEquals Arr, ReturnArr
+    
+TestExit:
+    Exit Sub
+TestFail:
+    Assert.Fail "Test raised an error: #" & Err.Number & " - " & Err.Description
+End Sub

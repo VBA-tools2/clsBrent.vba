@@ -1,0 +1,201 @@
+
+= clsBrent.vba
+:experimental:
+:icons:         // not sure if this is needed
+:sourcedir: ../src
+:testdir: ../tests
+:uri-commit-messages: https://www.conventionalcommits.org
+:uri-GitHub-FirstContribution: https://github.com/firstcontributions/first-contributions
+:uri-license: https://choosealicense.com/licenses/mit/
+:uri-quantcode-brent: http://www.quantcode.com/modules/mydownloads/singlefile.php?cid=9&lid=232
+:uri-rubberduck: https://rubberduckvba.com/
+:uri-UnitTests: https://en.wikipedia.org/wiki/Unit_testing
+// show the corresponding icons on GitHub, because otherwise "just" the text will be shown
+ifdef::env-github[]
+:caution-caption: :fire:
+:important-caption: :exclamation:
+:note-caption: :information_source:
+:tip-caption: :bulb:
+:warning-caption: :warning:
+endif::[]
+
+Excel VBA class providing Brent's method for finding a root of an equation.
+
+This is essentially a rewrite of class I originally found at {uri-quantcode-brent}, which unfortunately isn't available any more.
+
+== Features
+
+* supports additional function arguments (besides _x_)
+* status and error messages so you know what's going on
+* optionally you can provide a guess where to start the search
+
+== Prerequisites / Dependencies
+
+Since this is an Excel VBA class you obviously need Microsoft Excel.
+
+[#how-to-install]
+== How to install / Getting started
+
+Add the file(s) from the link:{sourcedir}[src] folder to your project.
+Yes, it's that simple.
+
+._If you need some more advice on how to do that, expand me._
+[%collapsible]
+====
+. Open Microsoft Excel.
+. Open the Visual Basic Editor (VBE) (kbd:[Alt+F11]).
+. Add the file(s) in the link:{sourcedir}[src] folder to your VBA project.
+** With {uri-rubberduck}[Rubberduck]:
+.. Right-click on the project to which you want to add the file(s) in the "`Code Explorer`" (to show it press kbd:[Ctrl+R]) and click on menu:Add[Existing Files...].
+.. Select all files in the link:{sourcedir}[src] folder and click on btn:[Open].
+** Without Rubberduck:
+.. Select all files in the link:{sourcedir}[src] folder in Windows File Explorer.
+.. Drag-and-drop them to the corresponding project in VBE's "`Project Explorer`". +
+   (To show it press kbd:[Ctrl+R].
+   Hit it twice if the Code Explorer shows up first.)
+// BUG: "project name" can't be put in normal angle brackets, because the closing bracket would be interpreted as menu delimiter. I couldn't find a way how to "escape" that (i.e. a backslash didn't work). Thus, single guillemets are used.
+. Check, if there are obvious errors by compiling the project (menu:Debug[Compile ‹project name›]).
+. Save the file/project.
+.. Be sure that the file/project you want to save is "`active`" in the VBE by checking, if its name is shown in VBE's title bar. +
+   (If it's not, open a (class) module of the corresponding project (and close it again).)
+.. Press the "`Save`" button (the disc symbol similar to 💾) in VBE's toolbar.
+.. Check that the file (really) was saved by having a look at the "`last modified date`" of the (project) file in the Windows File Explorer.
+====
+
+== Usage / Show it in action
+
+For simplicity let's simply find some roots of a second order polynomial function.
+First, we define the parabola function in a module as
+
+[source,vba]
+----
+Public Function Parabola( _
+    ByVal x As Double, _
+    Optional ByVal a2 As Double = 1, _
+    Optional ByVal a1 As Double = 0, _
+    Optional ByVal a0 As Double = 0 _
+        ) As Double
+    Parabola = a2 * x ^ 2 + a1 * x + a0
+End Function
+----
+
+We will use the the parameters `+a2 = 1+`, `+a1 = 3+` and `+a0 = -4+` for our tests.
+Since this is no rocket science, you can easily find analytically that the roots are then located at `+x1 = -4+` and `+x2 = 1+`.
+Now let's search for the left root (`+x1+`) with the Brent class e.g. with
+
+[source,vba]
+----
+Public Sub ParabolaRootSearch()
+    Dim Brent As clsBrent
+    Set Brent = New clsBrent
+
+    With Brent
+        .LowerBound = -6
+        .UpperBound = -2
+        .Guess = -5
+        .Arr = Array(1, 3, -4)
+        .FunctionName = "'" & Replace$(ThisWorkbook.Name, "'", "''") & "'!" & "Parabola"
+
+        Dim Root As Variant
+        Root = .Solve
+
+        If .Status <> eBrentStatus.eNoError Then
+            Debug.Print "Oh no ..."
+        Else
+            Debug.Print Root
+        End If
+    End With
+End Sub
+----
+
+which can be added to the same module as the function definition.
+(Before running/executing the above procedure, of course you need to add the Brent class to the workbook/the project as well.)
+With that I get the result -3.99999995967464 which is pretty close to the analytical solution.
+If you want to increase the accuracy, add e.g. `+.Accuracy = 0.00000001+` to the Brent options.
+Add `+.Silent = False+` as well and you'll get
+
+[source]
+----
+'mod_Test_clsBrent.xlsm'!Parabola   -6  -2
+  SolveX(9) = -4    (4,44089209850063E-15)
+----
+
+in the Immediate Window.
+The first row states the call with the given bounds and in the second you get the result, where the `+9+` indicates the number of iterations and the number in brackets on the right calculated _y_ value.
+
+== Running Tests
+
+Yes, {uri-UnitTests}[Unit Tests] in Excel _are_ possible.
+For that you need to have the awesome {uri-rubberduck}[Rubberduck] AddIn installed (and enabled).
+
+The procedure is very similar to the one given in the <<how-to-install>> section, but this time add the files from the link:{testdir}[tests] folder (instead of the files from the link:{sourcedir}[src] folder).
+When you are done with that, additionally perform the following steps.
+
+. Check that the files from the link:{sourcedir}[src] folder are present in the project as well or that you have a reference to project with the source files.footnote:[
+   See the collapsible in the next point on how to do that.
+   If you use the Rubberduck way, before adding the reference you first need to switch to the menu:Projects[] tab.
+] +
+  (Otherwise tests will/should fail.)
+. Add a reference to the "`Rubberduck AddIn`" to the project (with the test modules).
++
+._If you don't have a clue how to do that, expand me._
+[%collapsible]
+====
+* With {uri-rubberduck}[Rubberduck]:
+. Right-click somewhere on the project in the "`Code Explorer`" and click on menu:Add/Remove{sp}References...[].
+. Add the reference.
+.. Type (parts of) the library name in the search box until you see it in below (left) list or it is empty.
+** If the AddIn file name is in the lower left list box:
+... Select the library in the (left) list and
+... click on the btn:[➨] button to add it to the project references. +
+** If the the AddIn file name is _not_ in the list:
+... Click on the btn:[Browse...] button.
+... Browse to the folder where the AddIn is located.
+... Select the AddIn and
+... press the btn:[Open] button.
+. Click on the btn:[OK] button to close the window.
+* Without Rubberduck:
+. Open the Reference manager in the VBE (menu:Tools[References...]).
+** If the AddIn project name is in the list of available references:
+.. Add a checkmark to the corresponding library.
+** If it's _not_ in the list:
+.. Click on the btn:[Browse...] button.
+.. Browse to the folder where the AddIn is located.
+.. Select the AddIn and
+.. press the btn:[Open] button.
+. Click on the btn:[OK] button to close the window.
+. Save the file/project.
+====
++
+. Open the "`Test Explorer`" (menu:Rubberduck[Unit Tests > Test Explorer]).
+. Run the tests by clicking menu:Run[All Tests].
+
+[#used-by]
+== Used By
+
+Currently I don't know any public code where this code is used 😞.
+If _you_ know some, I will be happy to add them here.
+
+== Known issues and limitations
+
+None that I am aware of.
+
+[#contributing]
+== Contributing
+
+All contributions are highly welcome!!
+
+If you are new to git/GitHub, please have a look at {uri-GitHub-FirstContribution} where you will find a lot of useful information for beginners.
+
+I recently was pointed to {uri-commit-messages} which sounds very promising.
+I'll use them from now on too (and hopefully don't forget it in a hurry).
+
+== FAQ
+
+[qanda]
+What are the `+'@...+` comments good for in the code?::
+You should really have a look at the awesome {uri-rubberduck}[Rubberduck] project!
+
+== License
+
+{uri-license}[MIT]

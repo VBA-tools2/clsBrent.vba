@@ -21,7 +21,7 @@ Public Sub ModuleInitialize()
     Set Assert = New Rubberduck.PermissiveAssertClass
     Set Fakes = New Rubberduck.FakesProvider
     
-    sThisWorkbook = "'" & ThisWorkbook.Name & "'!"
+    sThisWorkbook = "'" & Replace$(ThisWorkbook.Name, "'", "''") & "'!"
 End Sub
 
 
